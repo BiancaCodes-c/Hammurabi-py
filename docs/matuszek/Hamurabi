@@ -1,0 +1,134 @@
+import random
+
+
+class Hammurabi:
+
+    def __init__(self):
+        self.rand = random.Random()
+
+    def main(self):
+        self.playGame()
+
+    def playGame(self):
+
+        population = 100
+        grain = 2800
+        acres = 1000
+        land_price = 19
+
+        year = 10
+
+        print("Welcome, Your Majesty!")
+        print("You and your royal partner rule the kingdom of Sumer.")
+        print("Guide your people wisely for the next 10 years.\n")
+
+        while year <= 10:
+
+            print(f"\n------ Year {year} of Your Reign ------")
+            print(f"Population: {population}")
+            print(f"Grain in storage: {grain}")
+            print(f"Acres owned: {acres}")
+            print(f"Land price: {land_price} bushels per acre\n")
+
+            # Player decisions
+            acres_to_buy = int(input("How many acres will you buy? "))
+            grain -= acres_to_buy * land_price
+            acres += acres_to_buy
+
+            grain_to_feed = int(input("How many bushels will you feed your people? "))
+            grain -= grain_to_feed
+
+            acres_to_plant = int(input("How many acres will you plant with seed? "))
+            seed_cost = acres_to_plant * 2
+            grain -= seed_cost
+
+            # Events
+            plague_deaths = self.plagueDeaths(population)
+            population -= plague_deaths
+
+            starved = self.starvationDeaths(population, grain_to_feed)
+            population -= starved
+
+            if self.uprising(population, starved):
+                print("\nYour people have revolted and overthrown and stromed your castle !")
+                return
+
+            if starved == 0:
+                new_people = self.immigrants(population, acres, grain)
+                population += new_people
+            else:
+                new_people = 0
+
+            harvest_amount = self.harvest(acres_to_plant)
+            grain += harvest_amount
+
+            rats = self.grainEatenByRats(grain)
+            grain -= rats
+
+            land_price = self.newCostOfLand()
+
+            # Year summary
+            print("\nRoyal Report:")
+            print(f"{plague_deaths} people died from plague.")
+            print(f"{starved} people starved.")
+            print(f"{new_people} immigrants came to the kingdom.")
+            print(f"You harvested {harvest_amount} bushels of grain.")
+            print(f"Rats destroyed {rats} bushels.")
+
+            year += 1
+
+        print("\nYour ten year reign has ended!")
+
+    # -------- Required Methods (TESTED) --------
+
+    def plagueDeaths(self, population):
+
+        if random.randint(0, 99) < 15:
+            return population // 2
+        return 0
+
+
+    def starvationDeaths(self, population, bushelsFedToPeople):
+
+        people_fed = bushelsFedToPeople // 20
+        deaths = population - people_fed
+
+        if deaths < 0:
+            return 0
+
+        return deaths
+
+
+    def uprising(self, population, howManyPeopleStarved):
+
+        return howManyPeopleStarved > population * 0.45
+
+
+    def immigrants(self, population, acresOwned, grainInStorage):
+
+        return (20 * acresOwned + grainInStorage) // (100 * population) + 1
+
+
+    def harvest(self, acres):
+
+        yield_per_acre = random.randint(1, 6)
+        return acres * yield_per_acre
+
+
+    def grainEatenByRats(self, bushels):
+
+        if random.randint(0, 99) < 40:
+            percent = random.randint(10, 30)
+            return (bushels * percent) // 100
+
+        return 0
+
+
+    def newCostOfLand(self):
+
+        return random.randint(17, 23)
+
+
+if __name__ == "__main__":
+    hammurabi = Hammurabi()
+    hammurabi.main()
